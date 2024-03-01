@@ -1,4 +1,4 @@
-
+# conda init powershell
 $newDirectoryName = "MegaDetector_Repo"
 $modelsDirectoryName = "Models"
 $modelFileName = "md_v5a.0.0.pt"
@@ -9,6 +9,8 @@ $grandparentPath = (Split-Path -Path $parentPath -Parent)
 $download = $true
 $downloadModel = $true
 $megaEnvironment = 'cameratraps-detector'
+$megaFilePath = "MegaDetector\envs\environment-detector.yml"
+
 $environmentExists = (conda info --envs | Select-String -Pattern "^$megaEnvironment").Count -gt 0
 
 # Combine the grandparent directory path and the new directory name
@@ -28,7 +30,7 @@ if (Test-Path -Path $newDirectoryPath -PathType Container) {
         New-Item -Path $newDirectoryPath -ItemType Directory
         Write-Host "Directory created successfully."
     } else {
-        Write-Host "Operation aborted."
+        Write-Host "Download not performed because the directory already existed"
         $download = $false
     }
 } else {
@@ -45,24 +47,26 @@ if ($download -eq $true) {
 }
 
 if ($environmentExists) {
-    conda activate cameratraps-detector
+    conda activate $megaEnvironment
+    Write-Host "The Conda environment '$megaEnvironment' already exists, you shouldn't need to do anything more to use it."
+    Write-Host "To reinstall, first run the following command in a terminal: conda env remove --name cameratraps-detector"
+
+    Write-Host "`nPackages already installed in the '$megaEnvironment' Conda environment:"
     conda list
-    Write-Host "The Conda environment '$megaEnvironment' already exists, you shouldn't need to do anything more to use it. 
-    To reinstall, first run the following command in a terminal: conda env remove --name cameratraps-detector"
+    conda deactivate
     } else {
     # Setup of the MegaDetector Python environment
     Set-Location -Path "$newDirectoryPath"
     Write-Host "Changed directory to: $newDirectoryPath"    
     # Doesn't work on DOC LAN network.  Go home, or hotspot from a phone, or try the guest wifi network
-    conda env create --file MegaDetector\envs\environment-detector.yml
-    conda activate cameratraps-detector
+    conda env create --file $megaFilePath MegaDetector\envs\environment-detector.yml
+    conda activate $megaEnvironment
+    Write-Host "The Conda environment '$megaEnvironment' was created with the following packages:"
     conda list
-    Write-Host "The Conda environment '$megaEnvironment' was created"
+    conda deactivate
     }
-Set-Location -Path $scriptDir
-conda deactivate
-Write-Host "The MegaDetector setup script has completed without error"
 
+Set-Location -Path $scriptDir
 
 
 #Now download the models file
@@ -94,3 +98,5 @@ if ($downloadModel -eq $true) {
     Invoke-WebRequest -Uri $modelURL -OutFile $modelFilePath
 }
 
+
+Write-Host "The MegaDetector setup script has completed without error"

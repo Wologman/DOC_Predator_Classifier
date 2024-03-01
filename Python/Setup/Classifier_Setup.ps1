@@ -7,14 +7,14 @@ $environmentExists = (conda info --envs | Select-String -Pattern "^$predatorEnvi
 if ($environmentExists) {
     conda activate $predatorEnvironment
     conda list
-    Write-Host "The Conda environment '$predatorEnvironment' already exists, you should not need to do anything further to run it. 
-    To reinstall first run the following command in a terminal: conda env remove --name cv_pytorch"
+    Write-Host "The Conda environment '$predatorEnvironment' already exists, you should not need to do anything further to run it." 
+    Write-Host "To reinstall first run the following command in a terminal: conda env remove --name cv_pytorch"
     } else {   
     # Doesn't work on DOC LAN network.  Go home, or hotspot from a phone, or try the guest wifi network
     conda env create --file $predatorYamlFile
     conda activate $predatorEnvironment
     conda list
-    Write-Host "The Conda environment '$megaEnvironment' was created"
+    Write-Host "The Conda environment '$predatorEnvironment' was created"
     }
 
 conda deactivate
